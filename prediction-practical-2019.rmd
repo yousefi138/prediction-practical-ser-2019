@@ -17,7 +17,8 @@ message = FALSE,
 cache=F)
 ```
 ```{r call_source, echo}
-read_chunk("/home/py16069/repos/prediction-practical-2019/prediction-practical-2019-sourcecode.r")
+path <- "."
+read_chunk(file.path(path, "prediction-practical-2019-sourcecode.r"))
 ```
 ```{r globals, results="hide", message = FALSE, warning = FALSE}
 ```
@@ -30,9 +31,10 @@ To start, everyone please make sure that:
 
 If not, this should get you up to speed:
 
-```{r load_students, eval = F, echo=T} 
+```{r dir, echo = T, eval = F} 
 ```
-```{r load_me} 
+
+```{r load, echo = T} 
 ```
 
 ## 
@@ -100,9 +102,7 @@ Let's add an never/ever smoking variable to our `samples` data frame:
 	* Try loading them into R
 
 
-```{r load.joehanes_students, eval = F, echo=T} 
-```
-```{r load.joehanes_me} 
+```{r load.joehanes, echo = T} 
 ```
 
 ## Methylation score from published coefficients
