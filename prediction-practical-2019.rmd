@@ -169,40 +169,20 @@ Let's also go ahead and make a nice named vector of the `joehanes` coefficients 
 5. Does the `joehanes` score predict never/ever smoking better than just cg05575921 alone?
 
 
-## ANSWER TIME!
-
-1. Apply the `joehanes` coefficients to our observed methylation values
+##
 
 ```{r answers1_1, echo=has.answers, results=has.answers} 
 ```
-
-2. Add the score to your existing `samples` data frame
-
 ```{r answers1_2, echo=has.answers, results=has.answers} 
 ```
-
-3. Calculate the AUC for this predictor
-
 ```{r answers1_3, echo=has.answers, results=has.answers} 
 ```
 
-## ANSWER TIME!
-
-4. Draw the ROC curve
-
-```{r answers1_4, echo=has.answers, results=has.answers} 
+## 
+```{r answers1_4, echo=has.answers, results=has.answers, fig.show=has.answer.figs} 
 ```
 
-## ANSWER TIME!
-
-5. Does the `joehanes` score predict never/ever smoking better than just cg05575921 alone?
-
-## ANSWER TIME!
-
-5. Does the `joehanes` score predict never/ever smoking better than just cg05575921 alone?
-
-No! Not according to the AUCs:
-
+##
 ```{r answers1_5, echo=has.answers, results=has.answers} 
 ```
 
@@ -292,36 +272,36 @@ We can see how well the model we just fit performs in new data by predicting on 
 4. Plot their performance on a ROC curve
 
 
-## ANSWER TIME!
+## 
 
 ```{r answers2_1, echo=has.answers, results=has.answers} 
 ```
 
-## ANSWER TIME!
+## 
 
 ```{r answers2_2, eval=F, echo=has.answers, results=has.answers}  
 ```
 ```{r answers2_2, eval=T, echo=has.answers, results=has.answers}  
 ```
 
-## ANSWER TIME!
+## 
 
 ```{r answers2_2_roc, echo=has.answers, results=has.answers} 
 ```
 
-## ANSWER TIME!
+## 
 
 ```{r answers2_3, echo=has.answers, results=has.answers}  
 ```
 
-## ANSWER TIME!
+## 
 
 ```{r answers2_4, echo=has.answers, results=has.answers}  
 ```
 
-## ANSWER TIME!
+## 
 
-```{r answers2_5, echo=has.answers, results=has.answers}  
+```{r answers2_5, echo=has.answers, results=has.answers, fig.show=has.answer.figs}  
 ```
 
 ## Next steps

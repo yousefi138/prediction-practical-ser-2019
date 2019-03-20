@@ -56,20 +56,29 @@ coefs <- joehanes$effect
 names(coefs) <- joehanes$probe.id
 
 ## ----answers1_1 -------------------------------------------------------------
+#1. Apply the joehanes coefficients to our observed 
+# 	methylation values
 y.hat <-   X %*% coefs 
 
 ## ----answers1_2 -------------------------------------------------------------
+#2. Add the score to your existing `samples` 
+#	data frame
 samples$y.hat <- as.vector(y.hat)
 
 ## ----answers1_3 -------------------------------------------------------------
+#3. Calculate the AUC for this predictor
 roc.out.again <- roc(never.smoke ~ y.hat, data = samples)
 roc.out.again$auc
 
 ## ----answers1_4 -------------------------------------------------------------
+#4. Draw the ROC curve
 plot.roc(roc.out)
 lines.roc(roc.out.again, col="red")
 
 ## ----answers1_5 -------------------------------------------------------------
+#5. Does the joehanes score predict never/ever 
+#	smoking better than just cg05575921 alone?
+### No! Not according to the AUCs:
 roc.out$auc
 roc.out.again$auc
 
