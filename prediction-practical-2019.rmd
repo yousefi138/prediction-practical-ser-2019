@@ -1,0 +1,333 @@
+% Detection and prediction using DNA methylation, practical
+% Paul Yousefi
+% April, 2019
+
+# Getting started 
+
+## 
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(
+comment = ">",
+error = FALSE,
+tidy = FALSE,
+echo = FALSE, 
+warning = FALSE, 
+message = FALSE, 
+cache=F)
+```
+```{r call_source, echo}
+read_chunk("/home/py16069/repos/prediction-practical-2019/prediction-practical-2019-sourcecode.r")
+```
+```{r globals, results="hide", message = FALSE, warning = FALSE}
+```
+
+To start, everyone please make sure that:
+
+* your directory is correctly set 
+
+* you only have the `dataset.rda` file loaded in active memory 
+
+If not, this should get you up to speed:
+
+```{r load_students, eval = F, echo=T} 
+```
+```{r load_me} 
+```
+
+## 
+```{r qc1, eval = F, echo=T} 
+```
+```{r qc2} 
+```
+
+* Our current smoking variable has 3 categories, but we want to work with a binary outcome 
+
+* Let's do that by collapsing the __former__ and __current__ subjects into a single category of ever smokers
+
+
+## 
+
+Let's add an never/ever smoking variable to our `samples` data frame:
+
+```{r never.smoke, echo=T}
+```
+
+* When I talk about predicting smoking going from now on I'll be referring to this variable 
+
+# Using a single CpG site as a predictor of smoking
+
+## Single CpG predictor
+
+* Let's start by seeing how well just the single top hit CpG does at predicting smoking
+
+	* cg05575921 in the _AHRR_ gene 
+
+* Start by adding it as a new variable to our `samples` data frame
+
+```{r ahrr, echo=T}
+```
+
+## Single CpG predictor
+
+* We'll use the `pROC` package to see how well `cg05575921` does at predicting `never.smoke`
+
+```{r roc1, eval = F, echo=T} 
+```
+
+## Single CpG predictor
+
+```{r roc1, eval = T, echo=T} 
+```
+```{r roc2, eval = T, echo=T} 
+```
+
+## Single CpG predictor
+
+```{r plot.roc, eval = T, echo=T} 
+```
+
+# Using published coefficients to make a prediction score
+
+## Methylation score from published coefficients
+
+* Let's compare how well our single site, `cg05575921`, performs at predicting smoking to a smoking score derived from the published coefficients of the largest blood EWAS meta-analysis to date by Joehanes et al. 2016
+
+* The coefficients were reported in their supplemental material
+	
+	* I've conveniently read them into R for you so they're ready to use (you're welcome!)
+
+	* Try loading them into R
+
+
+```{r load.joehanes_students, eval = F, echo=T} 
+```
+```{r load.joehanes_me} 
+```
+
+## Methylation score from published coefficients
+
+* The `joehanes` object has summary information on the `r nrow(joehanes)` CpGs that were significant at a Bonferroni p-value threshold in the original meta-analysis and that were available in our methylation dataset
+
+```{r joehanes_str, echo=T} 
+```
+
+## Methylation score from published coefficients
+
+* Let's restrict our big methylation data object, `meth`, to just the CpGs that are in the `joehanes` list 
+
+* This keeps the CpGs that we expect to be most related to smoking behavior while reducing the size of the data were working with 
+
+```{r subse.meth, echo=T} 
+```
+
+## Methylation score from published coefficients
+
+Transpose the methylation matrix so that the CpGs are the columns of the object, like they would be if they were normal variables
+
+```{r make.x, echo=T} 
+```
+
+* This puts our methylation covariates in the matrix-notation that is consistent with most mathematical notation of linear models
+
+## Methylation score from published coefficients
+
+That is, while you may be used to thinking of linear regression in this format:
+
+* $E(Y|X) = \beta_0 + \beta_1X_1 ... \beta_jX_j$
+
+You can also write an equation for the $\beta$ coefficients in matrix notation as below:
+
+* $\hat{\beta} = (X^TX)^{-1} X^Ty$
+
+This is a handy way of describing our coefficients when we're thinking about how to use them to generate fitted/predicted values:
+
+* $\hat{y} = X\hat{\beta}$
+
+## Methylation score from published coefficients
+
+Let's also go ahead and make a nice named vector of the `joehanes` coefficients that we can apply to our observed methylation and generate our smoking score ($\hat{y}$):
+
+```{r make_coefs, echo=T} 
+```
+
+## QUESTION TIME!
+
+1. Apply the `joehanes` coefficients to our observed methylation values
+
+2. Add the score to your existing `samples` data frame
+
+3. Calculate the AUC for this predictor
+
+4. Draw the ROC curve
+
+5. Does the `joehanes` score predict never/ever smoking better than just cg05575921 alone?
+
+
+## ANSWER TIME!
+
+1. Apply the `joehanes` coefficients to our observed methylation values
+
+```{r answers1_1, echo=T} 
+```
+
+2. Add the score to your existing `samples` data frame
+
+```{r answers1_2, echo=T} 
+```
+
+3. Calculate the AUC for this predictor
+
+```{r answers1_3, echo=T} 
+```
+
+## ANSWER TIME!
+
+4. Draw the ROC curve
+
+```{r answers1_4, eval = T, echo=T} 
+```
+
+## ANSWER TIME!
+
+5. Does the `joehanes` score predict never/ever smoking better than just cg05575921 alone?
+
+## ANSWER TIME!
+
+5. Does the `joehanes` score predict never/ever smoking better than just cg05575921 alone?
+
+No! Not according to the AUCs:
+
+```{r answers1_5, echo=T} 
+```
+
+# Train and test a new predictor with cross validation 
+
+## Making folds
+
+Let's chop our dataset up into several subsets so that we can train and test a prediction model on different observations in our dataset
+
+* We could do this using the base function, `sample()`, but if we want to make more than a couple folds this gets messy
+
+We'll use the `caret` package to automatically partition our data into 10-folds:
+
+```{r folds1, echo=T} 
+```
+
+## Making folds
+
+```{r folds2, echo=T} 
+```
+
+##
+
+* Use the first fold we generated to be our testing dataset 
+
+* The rest we'll use for training
+
+```{r test_train, echo=T} 
+```
+
+## Training
+
+* Let's train our own predictor using a lasso model, like we learned about in the lecture earlier
+
+	* E.g. the Liu et al. 2016 DNAm alcohol score used a lasso model
+
+
+
+## Training
+
+Load the `glmnet` package which has the lasso model function and try fitting on our training data
+
+```{r lasso, echo=T} 
+```
+
+* Remember: lasso picks the shrinkage factor, $\lambda$, by internal cross-validation
+
+## Lasso coefficients
+
+```{r coef.lasso, echo=T} 
+```
+
+## Lasso coefficients
+
+```{r coef-table-students, echo=T} 
+```
+
+## Predicting in new data
+
+We can see how well the model we just fit performs in new data by predicting on the observations from the testing set:
+
+```{r pred.lasso, echo=T} 
+```
+
+## ROC
+
+```{r roc.lasso, echo=T} 
+```
+
+* Seems like our performance is quite similar to the other methods we've tried so far
+
+## QUESTION TIME!
+
+1. Use another fold of our data to train at least __two__ new prediction models for never/ever smoking
+
+	* Any flavor of logistic regression (lm, glm, poisson, interactions, quadratics, any combination of CpGs)
+	* Forward/backward stepwise regression
+	* Mean value of Y
+	* K-nearest neighbors (`class::knn`)
+	* Bayes regression (arm::bayesglm)
+	* Or any other!
+
+2. For each method, predict the fitted value $\hat{y}$ in a separate fold 
+
+3. Calculate the AUCs for each
+
+4. Plot their performance on a ROC curve
+
+
+## ANSWER TIME!
+
+```{r answers2_1, echo=T} 
+```
+
+## ANSWER TIME!
+
+```{r answers2_2, eval=F, echo=T}  
+```
+```{r answers2_2, eval=T, echo=F}  
+```
+
+## ANSWER TIME!
+
+```{r answers2_2_roc, echo=T} 
+```
+
+## ANSWER TIME!
+
+```{r answers2_3, echo=T}  
+```
+
+## ANSWER TIME!
+
+```{r answers2_4, echo=T}  
+```
+
+## ANSWER TIME!
+
+```{r answers2_5, echo=T}  
+```
+
+## Next steps
+
+* The `SuperLearner` package can automate the cross validation using a library of candidate prediction models 
+
+	* [https://cran.r-project.org/web/packages/SuperLearner/index.html](https://cran.r-project.org/web/packages/SuperLearner/index.html)
+
+\begin{figure}[h!]
+    \centering
+	\includegraphics[width=.8\textwidth]{gfx/superlearner.png}
+\end{figure}
+
+
