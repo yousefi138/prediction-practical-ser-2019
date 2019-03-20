@@ -1,6 +1,11 @@
-% Detection and prediction using DNA methylation, practical
-% Paul Yousefi
-% April, 2019
+---
+title: "Detection and prediction using DNA methylation, practical"
+date: "`r format(Sys.time(), '%B %Y')`"
+author: "Paul Yousefi, PhD, MPH"
+output:
+  beamer_presentation:
+    theme: UoB
+---
 
 # Getting started 
 
