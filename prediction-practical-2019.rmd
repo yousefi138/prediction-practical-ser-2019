@@ -173,24 +173,24 @@ Let's also go ahead and make a nice named vector of the `joehanes` coefficients 
 
 1. Apply the `joehanes` coefficients to our observed methylation values
 
-```{r answers1_1, echo=T} 
+```{r answers1_1, echo=has.answers, results=has.answers} 
 ```
 
 2. Add the score to your existing `samples` data frame
 
-```{r answers1_2, echo=T} 
+```{r answers1_2, echo=has.answers, results=has.answers} 
 ```
 
 3. Calculate the AUC for this predictor
 
-```{r answers1_3, echo=T} 
+```{r answers1_3, echo=has.answers, results=has.answers} 
 ```
 
 ## ANSWER TIME!
 
 4. Draw the ROC curve
 
-```{r answers1_4, eval = T, echo=T} 
+```{r answers1_4, echo=has.answers, results=has.answers} 
 ```
 
 ## ANSWER TIME!
@@ -203,7 +203,7 @@ Let's also go ahead and make a nice named vector of the `joehanes` coefficients 
 
 No! Not according to the AUCs:
 
-```{r answers1_5, echo=T} 
+```{r answers1_5, echo=has.answers, results=has.answers} 
 ```
 
 # Train and test a new predictor with cross validation 
@@ -294,34 +294,34 @@ We can see how well the model we just fit performs in new data by predicting on 
 
 ## ANSWER TIME!
 
-```{r answers2_1, echo=T} 
+```{r answers2_1, echo=has.answers, results=has.answers} 
 ```
 
 ## ANSWER TIME!
 
-```{r answers2_2, eval=F, echo=T}  
+```{r answers2_2, eval=F, echo=has.answers, results=has.answers}  
 ```
-```{r answers2_2, eval=T, echo=F}  
-```
-
-## ANSWER TIME!
-
-```{r answers2_2_roc, echo=T} 
+```{r answers2_2, eval=T, echo=has.answers, results=has.answers}  
 ```
 
 ## ANSWER TIME!
 
-```{r answers2_3, echo=T}  
+```{r answers2_2_roc, echo=has.answers, results=has.answers} 
 ```
 
 ## ANSWER TIME!
 
-```{r answers2_4, echo=T}  
+```{r answers2_3, echo=has.answers, results=has.answers}  
 ```
 
 ## ANSWER TIME!
 
-```{r answers2_5, echo=T}  
+```{r answers2_4, echo=has.answers, results=has.answers}  
+```
+
+## ANSWER TIME!
+
+```{r answers2_5, echo=has.answers, results=has.answers}  
 ```
 
 ## Next steps
