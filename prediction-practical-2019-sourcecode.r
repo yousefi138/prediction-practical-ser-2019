@@ -2,26 +2,49 @@
 packages <- c("pander")
 lapply(packages, require, character.only=T)
 
-## ----dir-------------------------------------------------------------
-## for example:
-setwd("O:/teaching/advancedEpi_shortCourse")
-#rm(list=ls())
-
 ## ----load-------------------------------------------------------------
 load("dataset.rda")
 
+## ----ls -------------------------------------------------------------
+ls()
+
+## ----data.save -------------------------------------------------------------
+
+## rm(list=c("cc", "sva.age", "sva.smoking"))
+## ever.smoke <- sign(!samples$smoking=="never")
+## samples <- with(samples, data.frame(gsm = as.character(gsm),
+## 				gse, age, sex, smoking, ever.smoke, stringsAsFactors = F))
+## save(list = c("samples", "meth"), file = "dataset.rda")
+
 ## ----qc1 -------------------------------------------------------------
 str(samples)
+summary(samples)
+
 table(samples$smoking)
+table(samples$ever.smoke)
 
-## ----qc2 -------------------------------------------------------------
-pander(table(samples$smoking))
 
-## ----never.smoke -------------------------------------------------------------
-samples$never.smoke <- sign(samples$smoking=="never")
+## ----data.partition -------------------------------------------------------------
+library(caret)
 
-## be sure it matches the counts we'd expected
-table(samples$never.smoke)
+set.seed(138)
+in.train <- createDataPartition(
+  y = samples$ever.smoke,
+  ## the outcome data are needed
+  p = .75,
+  ## The percentage of data in the
+  ## training set
+  list = FALSE
+)
+
+## ----data.subset -------------------------------------------------------------
+
+training <- samples[ in.train,]
+testing  <- samples[-in.train,]
+
+nrow(training)
+nrow(testing)
+
 
 ## ----ahrr -------------------------------------------------------------
 samples$cg05575921 <- meth["cg05575921", ]
