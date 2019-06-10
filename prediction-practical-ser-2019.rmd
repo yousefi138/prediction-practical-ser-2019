@@ -6,6 +6,7 @@ output:
   html_document:
     css: style.css
     highlight: tango
+    toc: true
   pdf_document: default
 ---
 
@@ -160,7 +161,6 @@ Does the joehanes score predict never/ever smoking better than just cg05575921 a
 
 No, it doesn't appear to!
 
-$\vspace*{2\baselineskip}$
 
 # Training a novel predictor
 
@@ -172,3 +172,20 @@ $\vspace*{2\baselineskip}$
 ```{r data.subset}
 ```
 
+```{r data.subset}
+```
+
+```{r lasso}
+```
+
+```{r pred.lasso}
+```
+
+```{r roc.lasso}
+```
+
+```{r confusion.lasso}
+```
+
+```{r caret.models}
+```

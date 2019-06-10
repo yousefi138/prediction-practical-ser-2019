@@ -35,7 +35,10 @@ roc(ever.smoke ~ ahrr, data = samples)
 
 ## ----plot.roc -------------------------------------------------------------
 roc.out <- roc(ever.smoke ~ ahrr, data = samples)
-plot.roc(roc.out)
+plot(roc.out)
+plot(roc.out, 
+	print.thres="best",
+	print.thres.best.method="closest.topleft")
 
 ## ----load.joehanes -------------------------------------------------------------
 load("joehanes2016_st2_bonf.rda")
@@ -56,6 +59,8 @@ names(coefs) <- joehanes$probe.id
 ## ----apply_coefs -------------------------------------------------------------
 y.hat <-   X %*% coefs 
 
+summary(y.hat)
+
 ## ----add_yhat -------------------------------------------------------------
 samples$y.hat <- as.vector(y.hat)
 
@@ -63,8 +68,13 @@ samples$y.hat <- as.vector(y.hat)
 roc.out.again <- roc(ever.smoke ~ y.hat, data = samples)
 roc.out.again
 
-plot.roc(roc.out)
+plot(roc.out)
 lines.roc(roc.out.again, col="red")
+
+coords(roc.out.again, "best",
+					 best.method="closest.topleft", 
+					 ret=c("threshold", "accuracy")
+
 
 ## ----comp_roc -------------------------------------------------------------
 roc.out$auc
@@ -75,7 +85,8 @@ roc.out.again$auc
 ## ----data.partition -------------------------------------------------------------
 library(caret)
 
-set.seed(138)
+set.seed(138) # makes random processes reproducible
+Y <- samples$ever.smoke
 in.train <- createDataPartition(
   y = samples$ever.smoke,
   ## the outcome data are needed
@@ -86,15 +97,108 @@ in.train <- createDataPartition(
 )
 
 ## ----data.subset -------------------------------------------------------------
-
 training <- samples[ in.train,]
 testing  <- samples[-in.train,]
 
 nrow(training)
 nrow(testing)
 
+## ----lasso-------------------------------------------------------------
+library(glmnet)
+set.seed(20)
+fit.lasso <- cv.glmnet(y = training$ever.smoke, 
+						x = X[in.train,],  
+						family='binomial', 
+						alpha=1)
+
+## ----pred.lasso -------------------------------------------------------------
+pred.lasso <- predict(fit.lasso, newx = X[-in.train,], 
+					s = "lambda.min", 
+					type = "response")
+
+## ----roc.lasso-------------------------------------------------------------
+roc.lasso <- roc(testing$ever.smoke, as.vector(pred.lasso))
+roc.lasso
+plot(roc.lasso)
+
+## ----confusion.lasso -------------------------------------------------------------
+pred.lasso <- predict(fit.lasso, newx = X[-in.train,], 
+					s = "lambda.min", 
+					type = "class")
+
+caret::confusionMatrix(as.factor(pred.lasso), as.factor(testing$ever.smoke))
 
 
+
+## ----rf -------------------------------------------------------------
+set.seed(825)
+rf.fit <- caret::train(y = as.factor(training$ever.smoke), 
+				x = X[in.train,], 
+                method = "ranger")
+
+## ----pred.rf -------------------------------------------------------------
+pred.rf <- predict(rf.fit, newdata = X[-in.train,])
+confusionMatrix(pred.rf, as.factor(testing$ever.smoke))
+
+
+## ----caret.models -------------------------------------------------------------
+## list names of all caret models
+names(getModelInfo())
+
+
+## ----scratch -------------------------------------------------------------
+
+
+rf.fit <- train(y = as.factor(training$ever.smoke), 
+				x = X[in.train,], 
+                method = "svmRadial") 
+"gbm"
+
+
+set.seed(825)
+svmFit <- train(Class ~ ., data = training, 
+                 method = "svmRadial", 
+                 trControl = fitControl, 
+                 preProc = c("center", "scale"),
+                 tuneLength = 8,
+                 metric = "ROC")
+svmFit   
+
+
+
+rf_fit <- train(Species ~ ., 
+                data = iris, 
+                method = "ranger")
+
+
+rf_fit <- train(Species ~ ., 
+                data = iris, 
+                method = "glmnet")
+
+
+
+e_fit <- train(y = as.factor(training$ever.smoke), 
+				x = X[in.train,], 
+                method = "glmnet")
+
+
+## list names of all caret models
+names(getModelInfo())
+
+
+pred.enet <- predict(e_fit, newdata = X[-in.train,])
+confusionMatrix(pred.enet, as.factor(testing$ever.smoke))
+
+roc(testing$ever.smoke, as.numeric(as.character(pred.enet)))
+
+
+	newx = X[test,], type = "response", s = "lambda.min")
+
+
+
+plot(roc.out, print.thres="best", print.thres.best.method="closest.topleft")
+result.coords <- coords(roc.out, "best", best.method="closest.topleft", ret=c("threshold", "accuracy"))
+print(result.coords)#to get threshold and accuracy
 
 ## ----folds1-------------------------------------------------------------
 require(caret)
@@ -112,7 +216,7 @@ test <- flds$Fold01
 train <- (-test)
 
 
-## ----lasso-------------------------------------------------------------
+## ----lasso-old-------------------------------------------------------------
 require(glmnet)
 set.seed(420)
 fit.lasso <- cv.glmnet(X[train,], Y[train], 
@@ -130,7 +234,7 @@ str(coef.lasso)
 ## ----coef-table-students -------------------------------------------------------------
 coef.lasso
 
-## ----pred.lasso -------------------------------------------------------------
+## ----pred.lasso-old -------------------------------------------------------------
 pred.lasso <- as.vector(predict(fit.lasso, 
 	newx = X[test,], type = "response", s = "lambda.min"))
 
