@@ -11,12 +11,12 @@ output:
 
 # Before we start
 
-This lab will performed in R and will use the following packages
+This lab will performed in R and will use the following packages:
 
 __Add downloads__
 
 
-We'll be using data from tibshirani et al. that is publicly available on the gene expression ombibus (GEO) website
+We'll be using data from Tibshirani et al. that is publicly available on the gene expression ombibus (GEO) website
 
 All course material, including the data and code used for this lab practical, is available for you to download here:
 
@@ -25,9 +25,8 @@ __url for where to download data__
 
 # Goals 
 
-* Writing code for 
-
 * Partitioning data into training and testing sets
+* Evaluating performance of risk scores
 * Fitting models in training data
 * Predicting outputs from those models in the testing data
 * Quantifying model prediction performance
@@ -38,16 +37,16 @@ knitr::opts_chunk$set(
 comment = ">",
 error = FALSE,
 tidy = FALSE,
-echo = FALSE, 
+echo = TRUE, 
 warning = FALSE, 
 message = FALSE, 
 cache=F)
 ```
-```{r call_source, echo}
+```{r call_source, echo = F}
 path <- "."
-read_chunk(file.path(path, "prediction-practical-2019-sourcecode.r"))
+read_chunk(file.path(path, "prediction-practical-2019-ser-sourcecode.r"))
 ```
-```{r globals, results="hide", message = FALSE, warning = FALSE}
+```{r globals, echo = F, results="hide", message = F, warning = F}
 ```
 
 
@@ -74,21 +73,34 @@ Let's get a better sense of the variables available in `samples`:
 ```{r qc1, eval = T, echo=T} 
 ```
 
-##
-```{r qc2} 
+The `smoking` variable has 3 categories, but it's easiest to begin with a binary outcome so let's focus on the `ever.smoke` variable that collapses the __current__ and __former__ subjects into a single category
+
+* When I talk about predicting smoking going from now on I'll be referring to this `ever.smoke`variable 
+
+# Applying risk scores
+
+### Single variable scores
+
+The simplest type of risk score we can use for prediction is just a single individual variable. The site `cg05575921` in the _AHRR_ gene has consistently been the CpG with methylation showing the strongest association with smoking in several studies looking broadly across the genome.
+
+Perhaps the methylation levels of this site would be sufficient to predict whether someone has been a smoker. To see, let's begin by adding this CpG site as a variable to our phenotype data object `samples`:
+
+```{r ahrr} 
 ```
 
-* Our current smoking variable has 3 categories, but we want to work with a binary outcome 
+We can use a package called `pROC` to see how well different values of our `ahrr` variable explain smoking status:
 
-* Let's do that by collapsing the __former__ and __current__ subjects into a single category of ever smokers
-
-
-## 
-
-Let's add an never/ever smoking variable to our `samples` data frame:
-
-```{r never.smoke, echo=T}
+```{r roc1} 
 ```
 
-* When I talk about predicting smoking going from now on I'll be referring to this variable 
+We can also visualize our results by using the `pROC` package's `plot.roc()` function on the saved output
+
+```{r plot.roc}
+```
+
+### Weighted risk scores from published coefficients
+
+
+
+
 

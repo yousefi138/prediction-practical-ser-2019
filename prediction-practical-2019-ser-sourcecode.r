@@ -23,6 +23,61 @@ summary(samples)
 table(samples$smoking)
 table(samples$ever.smoke)
 
+## ----ahrr -------------------------------------------------------------
+samples$ahrr <- meth["cg05575921", ]
+
+## ----roc1 -------------------------------------------------------------
+## load the pROC package
+library("pROC")
+
+## use the formula-based syntax of the package
+roc(ever.smoke ~ ahrr, data = samples)
+
+## ----plot.roc -------------------------------------------------------------
+roc.out <- roc(ever.smoke ~ ahrr, data = samples)
+plot.roc(roc.out)
+
+## ----load.joehanes -------------------------------------------------------------
+load("joehanes2016_st2_bonf.rda")
+
+## ----joehanes_str-------------------------------------------------------------
+str(joehanes)
+
+## ----subse.meth -------------------------------------------------------------
+X <- t(meth[joehanes$probe.id, ])
+
+## ----make_coefs -------------------------------------------------------------
+coefs <- joehanes$effect 
+names(coefs) <- joehanes$probe.id
+
+## ----answers1_1 -------------------------------------------------------------
+#1. Apply the joehanes coefficients to our observed 
+# 	methylation values
+y.hat <-   X %*% coefs 
+
+## ----answers1_2 -------------------------------------------------------------
+#2. Add the score to your existing `samples` 
+#	data frame
+samples$y.hat <- as.vector(y.hat)
+
+## ----answers1_3 -------------------------------------------------------------
+#3. Calculate the AUC for this predictor
+roc.out.again <- roc(ever.smoke ~ y.hat, data = training)
+roc.out.again
+
+## ----answers1_4 -------------------------------------------------------------
+#4. Draw the ROC curve
+plot.roc(roc.out)
+lines.roc(roc.out.again, col="red")
+
+## ----answers1_5 -------------------------------------------------------------
+#5. Does the joehanes score predict never/ever 
+#	smoking better than just cg05575921 alone?
+### No! Not according to the AUCs:
+roc.out$auc
+roc.out.again$auc
+
+
 
 ## ----data.partition -------------------------------------------------------------
 library(caret)
@@ -46,64 +101,6 @@ nrow(training)
 nrow(testing)
 
 
-## ----ahrr -------------------------------------------------------------
-samples$cg05575921 <- meth["cg05575921", ]
-
-## ----roc1 -------------------------------------------------------------
-## load the pROC package
-require("pROC")
-
-## use the formula-based syntax of the package
-roc.out <- roc(never.smoke ~ cg05575921, data = samples)
-
-## ----roc2 -------------------------------------------------------------
-roc.out # man!! 
-
-## ----plot.roc -------------------------------------------------------------
-plot.roc(roc.out)
-
-## ----load.joehanes -------------------------------------------------------------
-load("joehanes2016_st2_bonf.rda")
-
-## ----joehanes_str-------------------------------------------------------------
-str(joehanes)
-
-## ----subse.meth -------------------------------------------------------------
-meth <- meth[joehanes$probe.id, ]
-
-## ----make.x -------------------------------------------------------------
-X <- t(meth)
-
-## ----make_coefs -------------------------------------------------------------
-coefs <- joehanes$effect 
-names(coefs) <- joehanes$probe.id
-
-## ----answers1_1 -------------------------------------------------------------
-#1. Apply the joehanes coefficients to our observed 
-# 	methylation values
-y.hat <-   X %*% coefs 
-
-## ----answers1_2 -------------------------------------------------------------
-#2. Add the score to your existing `samples` 
-#	data frame
-samples$y.hat <- as.vector(y.hat)
-
-## ----answers1_3 -------------------------------------------------------------
-#3. Calculate the AUC for this predictor
-roc.out.again <- roc(never.smoke ~ y.hat, data = samples)
-roc.out.again$auc
-
-## ----answers1_4 -------------------------------------------------------------
-#4. Draw the ROC curve
-plot.roc(roc.out)
-lines.roc(roc.out.again, col="red")
-
-## ----answers1_5 -------------------------------------------------------------
-#5. Does the joehanes score predict never/ever 
-#	smoking better than just cg05575921 alone?
-### No! Not according to the AUCs:
-roc.out$auc
-roc.out.again$auc
 
 
 ## ----folds1-------------------------------------------------------------
