@@ -100,7 +100,75 @@ We can also visualize our results by using the `pROC` package's `plot.roc()` fun
 
 ### Weighted risk scores from published coefficients
 
+Another common approach in omic prediction is to apply a risk score using information from multiple loci or omic measures weighted by previously reported magnitudes of association observed between those features and the outcome of interest. This has perhaps been most often performed using genetic data to compose 'polygenic risk scores', but can easily be extended to other types of data input.
+
+For example, in the context of DNA methylation data we can define and subsequently apply a smoking score derived from the published coefficients of the largest blood epigenome wide association study (EWAS) meta-analysis to date in Joehanes et al. 2016:
+
+>Joehanes R, Just AC, Marioni RE, Pilling LC, Reynolds LM, Mandaviya PR et al. Epigenetic Signatures of Cigarette Smoking. Circ Cardiovasc Genet 2016;
+
+* The coefficients from their models were distributed in their Supplemental Table 2 that I previously saved and load into R below: 
+
+```{r load.joehanes} 
+```
+
+The `joehanes` object has summary information on the `r nrow(joehanes)` CpGs that were significant at a Bonferroni p-value threshold in the original meta-analysis and that were available in our methylation dataset
+
+```{r joehanes_str} 
+```
+
+Let's restrict our big methylation data object, `meth`, to just the CpGs that are in the `joehanes` list. This keeps the CpGs that we expect to be most related to smoking behavior, in the correct format, while reducing the size of the data were working with:
+
+```{r subset.meth} 
+```
+
+To compute an individual's risk score using these coefficients, we need to take the sum of each coefficient multiplied by the participant's value at the corresponding variable, for example:
+
+$$\hat{Y}_{Joehanes Score} = \sum_{i}^{2617 CpGs} \hat{\beta}_{i} X_{i}$$
+
+* Where $\hat{\beta}_{i}$ are the individual previously estimated Joehanes et al. coefficients and $X_i$ are their corresponding variables (CpG site measurements in this case).
+
+Equivalently, we can compute the exact same quantity, $\hat{Y}_{Joehanes Score}$, more simply using matrix multiplication:
+
+$$\hat{Y}_{Joehanes Score} = X \hat{\beta}$$
+
+* Where X is an $N x P$ matrix of all P variables being used and $\hat{\beta}$ is a corresponding vector of all Joehanes et al. coefficients.
 
 
+To implement this, lets start by making a named vector of the `joehanes` coefficients:
 
+```{r make_coefs} 
+```
+
+We can then use matrix multiplication against our observed DNA methylation values to get our $\hat{Y}_{Joehanes Score}$ values:
+
+```{r apply_coefs} 
+```
+
+By adding this output as a variable to our `samples` data, we can again use the `pROC` package to evaluate and visualize the prediction performance of this score:
+
+
+```{r add_yhat}
+```
+
+```{r plot.roc.again}
+```
+
+Does the joehanes score predict never/ever smoking better than just cg05575921 alone?
+
+```{r comp_roc}
+```
+
+No, it doesn't appear to!
+
+$\vspace*{2\baselineskip}$
+
+# Training a novel predictor
+
+
+```{r data.partition}
+```
+
+
+```{r data.subset}
+```
 
