@@ -17,6 +17,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
+> ## R CMD BATCH --vanilla 'svm.r' &
+> 
 > ## ----load-------------------------------------------------------------
 > load("dataset.rda")
 > 
@@ -58,7 +60,7 @@ Loading required package: ggplot2
 + 				x = X[in.train,], 
 +                 method = "glmnet"))
    user  system elapsed 
- 22.226   0.852  23.070 
+ 23.322   1.847  25.160 
 > 
 > rf.fit
 glmnet 
@@ -88,19 +90,20 @@ The final values used for the model were alpha = 1 and lambda = 0.05511073.
 > 
 > a<-proc.time(); a;
    user  system elapsed 
- 37.130   2.033  39.124 
-> fit <- train(y = as.factor(training$ever.smoke), 
+ 38.804   3.215  41.979 
+> set.seed(637)
+> fit.svm <- caret::train(y = as.factor(training$ever.smoke), 
 + 				x = X[in.train,], 
 +                 method = "svmRadial") 
 > b<-proc.time()-a; b;
    user  system elapsed 
- 74.138   0.313  74.425 
+ 88.708   3.859  93.979 
 > (time <- paste0("Computation time = ", round(b[3]/60, 2)," minutes"))
-[1] "Computation time = 1.24 minutes"
+[1] "Computation time = 1.57 minutes"
 > 
 > 
-> save(list = c("fit"), file = "svm.rda")
+> save(list = c("fit.svm"), file = "fit.svm.rda")
 > 
 > proc.time()
    user  system elapsed 
-111.801   2.357 114.092 
+128.052   7.087 136.511 

@@ -17,6 +17,13 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
+> ## R CMD BATCH --vanilla 'ranger.r' &
+> 
+> ##  also attempted:
+> # method = "gbm_h2o"
+> # method = "avNNet"
+> # method = "gbm"
+> 
 > ## ----load-------------------------------------------------------------
 > load("dataset.rda")
 > 
@@ -58,7 +65,7 @@ Loading required package: ggplot2
 + 				x = X[in.train,], 
 +                 method = "glmnet"))
    user  system elapsed 
- 22.203   1.049  23.244 
+ 24.464   1.084  25.539 
 > 
 > rf.fit
 glmnet 
@@ -88,18 +95,19 @@ The final values used for the model were alpha = 1 and lambda = 0.05511073.
 > 
 > a<-proc.time(); a;
    user  system elapsed 
- 37.268   2.492  39.719 
-> fit <- train(y = as.factor(training$ever.smoke), 
+ 39.812   2.446  42.218 
+> set.seed(825)
+> fit.rf <- caret::train(y = as.factor(training$ever.smoke), 
 + 				x = X[in.train,], 
 +                 method = "ranger")
 > b<-proc.time()-a; b;
     user   system  elapsed 
-3148.815    9.638  129.864 
+3207.793   11.033  129.759 
 > (time <- paste0("Computation time = ", round(b[3]/60, 2)," minutes"))
 [1] "Computation time = 2.16 minutes"
 > 
-> save(list = c("fit"), file = "ranger.rda")
+> save(list = c("fit.rf"), file = "fit.rf.rda")
 > 
 > proc.time()
     user   system  elapsed 
-3186.406   12.131  169.908 
+3247.924   13.486  172.304 
