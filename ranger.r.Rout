@@ -1,0 +1,105 @@
+
+R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-redhat-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## ----load-------------------------------------------------------------
+> load("dataset.rda")
+> 
+> ## ----load.joehanes -------------------------------------------------------------
+> load("joehanes2016_st2_bonf.rda")
+> 
+> ## ----subset.meth -------------------------------------------------------------
+> X <- meth[joehanes$probe.id, ]
+> ## transpose to make columns = methylation site variables,
+> ##					rows = subjects/observations
+> X <- t(X) 
+> 
+> ## ----data.partition -------------------------------------------------------------
+> library(caret)
+Loading required package: lattice
+Loading required package: ggplot2
+> 
+> set.seed(138) # makes random processes reproducible
+> Y <- samples$ever.smoke
+> in.train <- createDataPartition(
++   y = samples$ever.smoke,
++   ## the outcome data are needed
++   p = .75,
++   ## The percentage of data in the
++   ## training set
++   list = FALSE
++ )
+> 
+> ## ----data.subset -------------------------------------------------------------
+> training <- samples[ in.train,]
+> testing  <- samples[-in.train,]
+> 
+> nrow(training)
+[1] 348
+> nrow(testing)
+[1] 116
+> 
+> system.time(rf.fit <- train(y = as.factor(training$ever.smoke), 
++ 				x = X[in.train,], 
++                 method = "glmnet"))
+   user  system elapsed 
+ 22.203   1.049  23.244 
+> 
+> rf.fit
+glmnet 
+
+ 348 samples
+2617 predictors
+   2 classes: '0', '1' 
+
+No pre-processing
+Resampling: Bootstrapped (25 reps) 
+Summary of sample sizes: 348, 348, 348, 348, 348, 348, ... 
+Resampling results across tuning parameters:
+
+  alpha  lambda      Accuracy   Kappa    
+  0.10   0.01742754  0.7656232  0.5024206
+  0.10   0.05511073  0.7646193  0.4991746
+  0.10   0.17427545  0.7683339  0.5081852
+  0.55   0.01742754  0.7644979  0.5016693
+  0.55   0.05511073  0.7685909  0.5105567
+  0.55   0.17427545  0.7785676  0.5210131
+  1.00   0.01742754  0.7603064  0.4917321
+  1.00   0.05511073  0.7833267  0.5388735
+  1.00   0.17427545  0.7010784  0.3013454
+
+Accuracy was used to select the optimal model using the largest value.
+The final values used for the model were alpha = 1 and lambda = 0.05511073.
+> 
+> a<-proc.time(); a;
+   user  system elapsed 
+ 37.268   2.492  39.719 
+> fit <- train(y = as.factor(training$ever.smoke), 
++ 				x = X[in.train,], 
++                 method = "ranger")
+> b<-proc.time()-a; b;
+    user   system  elapsed 
+3148.815    9.638  129.864 
+> (time <- paste0("Computation time = ", round(b[3]/60, 2)," minutes"))
+[1] "Computation time = 2.16 minutes"
+> 
+> save(list = c("fit"), file = "ranger.rda")
+> 
+> proc.time()
+    user   system  elapsed 
+3186.406   12.131  169.908 
