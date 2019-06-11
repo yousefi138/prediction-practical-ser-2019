@@ -1,3 +1,5 @@
+## R CMD BATCH --vanilla 'svm.r' &
+
 ## ----load-------------------------------------------------------------
 load("dataset.rda")
 
@@ -38,11 +40,12 @@ system.time(rf.fit <- train(y = as.factor(training$ever.smoke),
 rf.fit
 
 a<-proc.time(); a;
-fit <- train(y = as.factor(training$ever.smoke), 
+set.seed(637)
+fit.svm <- caret::train(y = as.factor(training$ever.smoke), 
 				x = X[in.train,], 
                 method = "svmRadial") 
 b<-proc.time()-a; b;
 (time <- paste0("Computation time = ", round(b[3]/60, 2)," minutes"))
 
 
-save(list = c("fit"), file = "svm.rda")
+save(list = c("fit.svm"), file = "fit.svm.rda")

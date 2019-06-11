@@ -1,3 +1,10 @@
+## R CMD BATCH --vanilla 'ranger.r' &
+
+##  also attempted:
+# method = "gbm_h2o"
+# method = "avNNet"
+# method = "gbm"
+
 ## ----load-------------------------------------------------------------
 load("dataset.rda")
 
@@ -38,10 +45,11 @@ system.time(rf.fit <- train(y = as.factor(training$ever.smoke),
 rf.fit
 
 a<-proc.time(); a;
-fit <- train(y = as.factor(training$ever.smoke), 
+set.seed(825)
+fit.rf <- caret::train(y = as.factor(training$ever.smoke), 
 				x = X[in.train,], 
                 method = "ranger")
 b<-proc.time()-a; b;
 (time <- paste0("Computation time = ", round(b[3]/60, 2)," minutes"))
 
-save(list = c("fit"), file = "ranger.rda")
+save(list = c("fit.rf"), file = "fit.rf.rda")
