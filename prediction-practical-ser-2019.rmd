@@ -14,10 +14,14 @@ output:
 
 This lab will performed in R and will use the following packages:
 
-__Add downloads__
+* `pROC`
+* `caret`
+* `glmnet`
+* `ranger`
+* `kernlab`
 
 
-We'll be using data from Tibshirani et al. that is publicly available on the gene expression ombibus (GEO) website
+We'll be using data from Tsaprouni et al. 2014 that is publicly available on the NCBI Gene Expression Ombibus (GEO) website (accession number: GSE50660) at https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE50660
 
 All course material, including the data and code used for this lab practical, is available for you to download here:
 
@@ -159,33 +163,104 @@ Does the joehanes score predict never/ever smoking better than just cg05575921 a
 ```{r comp_roc}
 ```
 
-No, it doesn't appear to!
+No, it doesn't appear to! Can you think of any possible explanations for why this might be the case??
 
 
 # Training a novel predictor
 
+Up until now, we've been evaluating the performance of predictors that other independent studies had previously developed. To develop our own prediction models, we first need to split our dataset into two parts:
+
+1. a training set: the major subset of data where we can _fit_ our prediction models and estimate their relevant parameter values with access to the outcome variable observations
+
+2. testing set: a smaller sub-set of observations withheld from training where we can _apply_ the models with trained and get an independent assessment of the predictor performance
+
+This data splitting approach is essentially replicating within our own dataset the design we used implicitly to evaluate the performance of Joehanes et al. 2016 smoking score:
+
+* There, the observations in the original Joehanes et al. 2016 paper served as the training set and the Tibshirani et al. data we've been using was the testing set
+
+* Here, without access to two independent datasets we'll need to artificially generate a partition within our single dataset: reserving a subset of observations for training, and the remaining subset for testing
+
+
+The `caret` package has functions to help with splitting the observations of your dataset along with a suite of other tools commonly used to train and test prediction models.
+
+One of these is the `createDataPartition()` function which creates an index of the rows that will be allocated for training vs. testing at a user-selected percentage split of the observations. Below we dedicate 75% percent of our data for training and reserve 25% for testing:
 
 ```{r data.partition}
 ```
 
+The index returned by `createDataPartition()` can then be easily used to split our `samples` data object into two separate objects:
 
 ```{r data.subset}
 ```
 
-```{r data.subset}
-```
+### Manual model training
+
+Once these two independent set of observations have been generated, we can easily fit any model we can think up in the training subset and assess how well it performs in the reserved testing subset.
+
+For example, if we wanted to see how well a linear subset of the `r nrow(joehanes)` CpGs that were bonferroni significant in Joehanes et al. 2016 performed at predicting our `ever.smoke` variable we could fit a penalized regression model like a lasso (least absolute shrinkage and selection operator) in our training dataset:
 
 ```{r lasso}
 ```
 
+And then predict from that model into the reserved testing observations:
+
 ```{r pred.lasso}
 ```
+
+All of the tools we'd employed previously from the `pROC` package can still be used to asses how well our new predictions performed:
 
 ```{r roc.lasso}
 ```
 
+Up until now, the output we'd been returning from the `predict()` function had all been on 0 to 1 probability scale (i.e. the probability the model predict of an observation being a 'ever smoker') because we'd used the `type = "response"` argument.
+
+However, `predict()` can alternately return the class that the model predicts is most probable by changing the `type` argument to be `type = "class"`. 
+
+```{r confusion.pred.lasso}
+```
+
+This is useful to be able to use an additional function called `confusionMatrix()` in the `caret` package that allows us to more carefully compare how our predictions correspond to the truth and what errors we're experiencing 
+
 ```{r confusion.lasso}
 ```
 
+### Caret model training
+
+While any model can conceivably be trained/tested in our partitioned datasets, we need to know the R-package that distributes that model and the potentially idiosyncratic syntax for fitting that particular model. 
+
+However, the `caret` package's function `train()` is a wrapper the conveniently facilitates a common syntax for implementing many common machine learning/prediction models. This makes it easier to quickly deploy a diverse set of candidate models with less hassle required to develop model/package-specific code.
+
+For example, we can perform a rather basic call to `train()` in order to fit a RandomForest model from the `ranger` package: 
+
+```{r load.fits, echo = F}
+```
+
+```{r rf, eval = F}
+```
+
+Fitting our training model with this approach still allows us to predict and evaluate model fits in the testing dataset in the ways we've learned so far:
+
+```{r pred.rf}
+```
+
+Conveniently however, we can train a host of different models by only modifying the `method` argument in `train()`. Thus, deciding we would additionally like to fit a Support Vector Machines model from the `kernlab` package only requires updating our method to `method = "svmRadial"`
+
+```{r svm, eval = F}
+```
+
+```{r pred.svm}
+```
+
+An extremely diverse selection of models is available through `train()` and details on the implementation of each is listed on the `caret` website http://topepo.github.io/caret/train-models-by-tag.html
+
+
 ```{r caret.models}
 ```
+
+It should additionally be noted that the `train()` function has powerful functionality beyond simply providing convenient code for calling a large variety of different models. However, these will be explored in great depth later in the workshop. 
+
+Be patient young padawan!
+
+
+
+
