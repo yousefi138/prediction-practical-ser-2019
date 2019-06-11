@@ -262,5 +262,5 @@ It should additionally be noted that the `train()` function has powerful functio
 Be patient young padawan!
 
 
-
+![](gfx/yoda.jpeg "Jedi prediction is powerful!")
 
