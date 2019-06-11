@@ -73,7 +73,7 @@ lines.roc(roc.out.again, col="red")
 
 coords(roc.out.again, "best",
 					 best.method="closest.topleft", 
-					 ret=c("threshold", "accuracy")
+					 ret=c("threshold", "accuracy"))
 
 
 ## ----comp_roc -------------------------------------------------------------
@@ -238,7 +238,7 @@ coef.lasso
 pred.lasso <- as.vector(predict(fit.lasso, 
 	newx = X[test,], type = "response", s = "lambda.min"))
 
-## ----roc.lasso-------------------------------------------------------------
+## ----roc.lasso.old-------------------------------------------------------------
 roc.out.l <- roc(Y[test], pred.lasso)
 roc.out.l$auc
 
