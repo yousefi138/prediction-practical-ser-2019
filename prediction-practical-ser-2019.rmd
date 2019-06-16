@@ -1,5 +1,5 @@
 ---
-title: "Crash course introduction to prediction computation"
+title: "Introduction to omic prediction computation"
 date: "`r format(Sys.time(), '%B %Y')`"
 author: "Paul Yousefi, PhD, MPH"
 output:
