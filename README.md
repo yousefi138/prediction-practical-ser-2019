@@ -2,7 +2,7 @@
 
 Follow along with the practical by downloading the webpage, pdf, and/or r-script files with the following names from those listed above, saving to your local machine, and then opening them locally.
 
-* to download: 
+To download: 
  * right click on the file you want
  * select 'save as' and save to disired location
  * go to saved location and open from there
