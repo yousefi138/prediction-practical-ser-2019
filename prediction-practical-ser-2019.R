@@ -1,75 +1,154 @@
-## ---- echo = FALSE, message = FALSE--------------------------------------
-knitr::opts_chunk$set(
-comment = ">",
-error = FALSE,
-tidy = FALSE,
-echo = TRUE, 
-warning = FALSE, 
-message = FALSE, 
-cache=F)
+## ----load-------------------------------------------------------------
+load("dataset.rda")
 
-## ----call_source, echo = F-----------------------------------------------
-path <- "."
-read_chunk(file.path(path, "prediction-practical-2019-ser-sourcecode.r"))
+## ----ls -------------------------------------------------------------
+ls()
 
-## ----globals, echo = F, results="hide", message = F, warning = F---------
+## ----qc1 -------------------------------------------------------------
+str(samples)
+summary(samples)
 
-## ----load, echo = T------------------------------------------------------
+table(samples$smoking)
+table(samples$ever.smoke)
 
-## ----ls, eval = F, echo=T------------------------------------------------
-## NA
+## ----ahrr -------------------------------------------------------------
+samples$ahrr <- meth["cg05575921", ]
 
-## ----qc1, eval = T, echo=T-----------------------------------------------
+## ----roc1 -------------------------------------------------------------
+## load the pROC package
+library("pROC")
 
-## ----ahrr----------------------------------------------------------------
+## use the formula-based syntax of the package
+roc(ever.smoke ~ ahrr, data = samples)
 
-## ----roc1----------------------------------------------------------------
+## ----plot.roc -------------------------------------------------------------
+roc.out <- roc(ever.smoke ~ ahrr, data = samples)
+plot(roc.out)
+plot(roc.out, 
+	print.thres="best",
+	print.thres.best.method="closest.topleft")
 
-## ----plot.roc------------------------------------------------------------
+## ----load.joehanes -------------------------------------------------------------
+load("joehanes2016_st2_bonf.rda")
 
-## ----load.joehanes-------------------------------------------------------
+## ----joehanes_str-------------------------------------------------------------
+str(joehanes)
 
-## ----joehanes_str--------------------------------------------------------
+## ----subset.meth -------------------------------------------------------------
+X <- meth[joehanes$probe.id, ]
+## transpose to make columns = methylation site variables,
+##					rows = subjects/observations
+X <- t(X) 
 
-## ----subset.meth---------------------------------------------------------
+## ----make_coefs -------------------------------------------------------------
+coefs <- joehanes$effect 
+names(coefs) <- joehanes$probe.id
 
-## ----make_coefs----------------------------------------------------------
+## ----apply_coefs -------------------------------------------------------------
+y.hat <-   X %*% coefs 
 
-## ----apply_coefs---------------------------------------------------------
+summary(y.hat)
 
-## ----add_yhat------------------------------------------------------------
+## ----add_yhat -------------------------------------------------------------
+samples$y.hat <- as.vector(y.hat)
 
-## ----plot.roc.again------------------------------------------------------
+## ----plot.roc.again -------------------------------------------------------------
+roc.out.again <- roc(ever.smoke ~ y.hat, data = samples)
+roc.out.again
 
-## ----comp_roc------------------------------------------------------------
+plot(roc.out)
+lines.roc(roc.out.again, col="red")
 
-## ----data.partition------------------------------------------------------
+coords(roc.out.again, "best",
+					 best.method="closest.topleft", 
+					 ret=c("threshold", "accuracy"))
 
-## ----data.subset---------------------------------------------------------
 
-## ----kfolds--------------------------------------------------------------
+## ----comp_roc -------------------------------------------------------------
+roc.out$auc
+roc.out.again$auc
 
-## ----lasso---------------------------------------------------------------
 
-## ----pred.lasso----------------------------------------------------------
 
-## ----roc.lasso-----------------------------------------------------------
+## ----data.partition -------------------------------------------------------------
+library(caret)
 
-## ----confusion.pred.lasso------------------------------------------------
+set.seed(138) # makes random processes reproducible
+Y <- samples$ever.smoke
+in.train <- createDataPartition(
+  y = samples$ever.smoke,
+  ## the outcome data are needed
+  p = .75,
+  ## The percentage of data in the
+  ## training set
+  list = FALSE
+)
 
-## ----confusion.lasso-----------------------------------------------------
+## ----data.subset -------------------------------------------------------------
+training <- samples[ in.train,]
+testing  <- samples[-in.train,]
 
-## ----load.fits, echo = F-------------------------------------------------
+nrow(training)
+nrow(testing)
 
-## ----rf, eval = F--------------------------------------------------------
-## NA
+## ----kfolds -------------------------------------------------------------
+flds <- createFolds(
+          y = samples$ever.smoke, 
+          k = 10) ## number of folds 
 
-## ----pred.rf-------------------------------------------------------------
+## ----lasso-------------------------------------------------------------
+library(glmnet)
+set.seed(20)
+fit.lasso <- cv.glmnet(y = training$ever.smoke, 
+						x = X[in.train,],  
+						family='binomial', 
+						alpha=1)
 
-## ----svm, eval = F-------------------------------------------------------
-## NA
+## ----pred.lasso -------------------------------------------------------------
+pred.lasso <- predict(fit.lasso, newx = X[-in.train,], 
+					s = "lambda.min", 
+					type = "response")
 
-## ----pred.svm------------------------------------------------------------
+## ----roc.lasso-------------------------------------------------------------
+roc.lasso <- roc(testing$ever.smoke, as.vector(pred.lasso))
+roc.lasso
+plot(roc.lasso)
 
-## ----caret.models--------------------------------------------------------
+## ----confusion.pred.lasso -------------------------------------------------------------
+pred.lasso <- predict(fit.lasso, newx = X[-in.train,], 
+					s = "lambda.min", 
+					type = "class")
+
+## ----confusion.lasso -------------------------------------------------------------
+caret::confusionMatrix(as.factor(pred.lasso), as.factor(testing$ever.smoke))
+
+
+## ----rf -------------------------------------------------------------
+set.seed(825)
+fit.rf <- caret::train(y = as.factor(training$ever.smoke), 
+				x = X[in.train,], 
+                method = "ranger") # 2.2 minutes
+
+## ----pred.rf -------------------------------------------------------------
+pred.rf <- predict(fit.rf, newdata = X[-in.train,])
+confusionMatrix(pred.rf, as.factor(testing$ever.smoke))
+
+
+## ----svm -------------------------------------------------------------
+set.seed(637)
+fit.svm <- caret::train(y = as.factor(training$ever.smoke), 
+				x = X[in.train,], 
+                method = "svmRadial") ## 1.6 minutes 
+
+
+## ----pred.svm -------------------------------------------------------------
+pred.svm <- predict(fit.svm, newdata = X[-in.train,])
+confusionMatrix(pred.svm, as.factor(testing$ever.smoke))
+
+
+## ----caret.models -------------------------------------------------------------
+## list names of all caret models
+names(getModelInfo())
+
+
 
