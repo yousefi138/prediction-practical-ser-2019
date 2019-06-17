@@ -103,6 +103,11 @@ testing  <- samples[-in.train,]
 nrow(training)
 nrow(testing)
 
+## ----kfolds -------------------------------------------------------------
+flds <- createFolds(
+          y = samples$ever.smoke, 
+          k = 10) ## number of folds 
+
 ## ----lasso-------------------------------------------------------------
 library(glmnet)
 set.seed(20)

@@ -23,9 +23,13 @@ This lab will performed in R and will use the following packages:
 
 We'll be using data from Tsaprouni et al. 2014 that is publicly available on the NCBI Gene Expression Ombibus (GEO) website (accession number: GSE50660) at https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE50660
 
-All course material, including the data and code used for this lab practical, is available for you to download here:
+We use cleaned version of this data, in a file called `dataset.rda`, that can be downloaded here:
 
-__url for where to download data__
+* https://tinyurl.com/ser-omics-2019
+
+All other course material, including the code for this lab practical, is available on the course GitHub page:
+
+* https://github.com/yousefi138/prediction-practical-ser-2019
 
 
 # Goals 
@@ -35,6 +39,7 @@ __url for where to download data__
 * Fitting models in training data
 * Predicting outputs from those models in the testing data
 * Quantifying model prediction performance
+* Experience fitting interpretable and black box machine learning models
 
 
 ```{r, echo = FALSE, message = FALSE}
@@ -176,7 +181,7 @@ Up until now, we've been evaluating the performance of predictors that other ind
 
 This data splitting approach is essentially replicating within our own dataset the design we used implicitly to evaluate the performance of Joehanes et al. 2016 smoking score:
 
-* There, the observations in the original Joehanes et al. 2016 paper served as the training set and the Tibshirani et al. data we've been using was the testing set
+* There, the observations in the original Joehanes et al. 2016 paper served as the training set and the Tsaprouni et al. data we've been using was the testing set
 
 * Here, without access to two independent datasets we'll need to artificially generate a partition within our single dataset: reserving a subset of observations for training, and the remaining subset for testing
 
@@ -192,6 +197,13 @@ The index returned by `createDataPartition()` can then be easily used to split o
 
 ```{r data.subset}
 ```
+
+
+While `createDataPartition()` only makes one split, we can expand this to $k$ different splits for the k-fold cross-validation setting withe the `createFolds()` function:
+
+```{r kfolds}
+```
+
 
 ### Manual model training
 
@@ -230,6 +242,8 @@ While any model can conceivably be trained/tested in our partitioned datasets, w
 
 However, the `caret` package's function `train()` is a wrapper the conveniently facilitates a common syntax for implementing many common machine learning/prediction models. This makes it easier to quickly deploy a diverse set of candidate models with less hassle required to develop model/package-specific code.
 
+* Additionally, the `train()` function has easy syntax through it's `trControl` and `tuneLength` arguments to tune optimal model hyperparameters by resampling
+
 For example, we can perform a rather basic call to `train()` in order to fit a RandomForest model from the `ranger` package: 
 
 ```{r load.fits, echo = F}
@@ -257,10 +271,5 @@ An extremely diverse selection of models is available through `train()` and deta
 ```{r caret.models}
 ```
 
-It should additionally be noted that the `train()` function has powerful functionality beyond simply providing convenient code for calling a large variety of different models. However, these will be explored in great depth later in the workshop. 
 
-Be patient young padawan!
-
-
-![](gfx/yoda.jpeg "Jedi prediction is powerful!")
 
