@@ -1,11 +1,9 @@
 # prediction-practical-2019
 
-Follow along with the practical by downloading the webpage, pdf, and/or r-script files with the following names from those listed above (or linked to below), saving to your local machine, and then opening them locally.
+Follow along with the practical by clicking the webpage or pdf links below
 
-To download: 
- * right click on the link to file you want
- * select 'save as' and save to disired location
- * go to saved location and open from there
+The accompanying R-script and data links below provide everything needed to reproduce all presented analysis
+
 
 ### Webpage
 
@@ -25,7 +23,7 @@ To download:
 
 * [joehanes2016_st2_bonf.rda](joehanes2016_st2_bonf.rda)
 
-# All workshop pdfs:
+## All workshop pdfs:
 
 * These are also all hosted in the subdirectory [slides/](slides)
 
