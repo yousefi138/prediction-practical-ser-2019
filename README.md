@@ -9,20 +9,27 @@ To download:
 
 ### Webpage
 
-`prediction-practical-ser-2019.html`
+[prediction-practical-ser-2019.html](prediction-practical-ser-2019.html)
 
 ### PDF
 
-`prediction-practical-ser-2019.pdf`
+[prediction-practical-ser-2019.pdf](prediction-practical-ser-2019.pdf)
 
 ### R script
 
-`prediction-practical-ser-2019.R`
+[prediction-practical-ser-2019.R](prediction-practical-ser-2019.R)
 
+### Data
+
+* dataset.rda https://tinyurl.com/ser-omics-2019
+
+* [joehanes2016_st2_bonf.rda](joehanes2016_st2_bonf.rda)
 
 # All workshop pdfs:
 
-* These are also all hosted in the subdirectory `slides`
+* These are also all hosted in the subdirectory [slides/](slides)
+
+
 
 
 
