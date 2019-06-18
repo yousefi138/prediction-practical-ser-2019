@@ -1,6 +1,6 @@
-# prediction-practical-2019
+# SER 2019 Omic Prediction Practical Demonstration
 
-Follow along with the practical by clicking the webpage or pdf links below
+Follow along with the demonstration by clicking the webpage or pdf links below
 
 The accompanying R-script and data links below provide everything needed to reproduce all presented analysis
 
@@ -25,7 +25,7 @@ The accompanying R-script and data links below provide everything needed to repr
 
 ## All workshop pdfs:
 
-* These are also all hosted in the subdirectory [slides/](slides)
+* These are all hosted in the [slides/](slides) subdirectory 
 
 
 
