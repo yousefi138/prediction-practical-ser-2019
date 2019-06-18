@@ -9,7 +9,7 @@ To download:
 
 ### Webpage
 
-[prediction-practical-ser-2019.html](htmlpreview.github.io?/https://github.com/yousefi138/prediction-practical-ser-2019/blob/master/prediction-practical-ser-2019.html)
+[prediction-practical-ser-2019.html](htmlpreview.github.io/?https://github.com/yousefi138/prediction-practical-ser-2019/blob/master/prediction-practical-ser-2019.html)
 
 ### PDF
 
